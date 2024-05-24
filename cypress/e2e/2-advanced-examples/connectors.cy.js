@@ -9,7 +9,6 @@ context('Connectors', () => {
     // https://on.cypress.io/each
     cy.get('.connectors-each-ul>li')
       .each(($el, index, $list) => {
-        // eslint-disable-next-line no-console
         console.log($el, index, $list)
       })
   })
@@ -25,12 +24,13 @@ context('Connectors', () => {
   it('.invoke() - invoke a function on the current subject', () => {
     // our div is hidden in our script.js
     // $('.connectors-div').hide()
+    cy.get('.connectors-div').should('be.hidden')
 
     // https://on.cypress.io/invoke
-    cy.get('.connectors-div').should('be.hidden')
-      // call the jquery method 'show' on the 'div.container'
-      .invoke('show')
-      .should('be.visible')
+    // call the jquery method 'show' on the 'div.container'
+    cy.get('.connectors-div').invoke('show')
+
+    cy.get('.connectors-div').should('be.visible')
   })
 
   it('.spread() - spread an array as individual args to callback function', () => {

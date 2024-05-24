@@ -1,23 +1,26 @@
 # GitHub Actions
-# https://help.github.com/en/articles/configuring-a-workflow
-# good list of examples at http://www.thedreaming.org/2019/09/10/github-ci/
+# https://docs.github.com/en/actions/using-workflows
+# See also .github/workflows/using-action.yml in this repository
+# for an example of using the Cypress GitHub JavaScript action
+# https://github.com/cypress-io/github-action
+#
 name: Cypress parallel tests
 
-on: push
+on: [push, workflow_dispatch]
 
 jobs:
   install:
-    name: Install NPM and Cypress
-    runs-on: ubuntu-18.04
+    name: Install npm and Cypress
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
 
       # install a specific version of Node using
       # https://github.com/actions/setup-node
-      - name: Use Node.js v12
-        uses: actions/setup-node@v1
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
         with:
-          node-version: 12
+          node-version: 20
 
       # just so we learn about available environment variables GitHub provides
       - name: Print CI env variables
@@ -25,14 +28,14 @@ jobs:
           npm i -g @bahmutov/print-env@2
           print-env GITHUB BUILD ACTIONS || true
 
-      # Restore the previous NPM modules and Cypress binary archives.
+      # Restore the previous npm modules and Cypress binary archives.
       # Any updated archives will be saved automatically after the entire
       # workflow successfully finishes.
       # See https://github.com/actions/cache
-      # we use exact restore key to avoid NPM module snowballing
+      # we use exact restore key to avoid npm module snowballing
       # https://glebbahmutov.com/blog/do-not-let-npm-cache-snowball/
-      - name: Cache central NPM modules
-        uses: actions/cache@v1
+      - name: Cache central npm modules
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ github.ref }}-${{ hashFiles('**/package-lock.json') }}
@@ -42,16 +45,16 @@ jobs:
       # we use the exact restore key to avoid Cypress binary snowballing
       # https://glebbahmutov.com/blog/do-not-let-cypress-cache-snowball/
       - name: Cache Cypress binary
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ~/.cache/Cypress
-          key: cypress-${{ runner.os }}-cypress-${{ github.ref }}-${{ hashFiles('**/package.json') }}
+          key: cypress-${{ runner.os }}-cypress-${{ github.ref }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            cypress-${{ runner.os }}-cypress-${{ github.ref }}-${{ hashFiles('**/package.json') }}
+            cypress-${{ runner.os }}-cypress-${{ github.ref }}-${{ hashFiles('**/package-lock.json') }}
 
       # Cache local node_modules to pass to testing jobs
       - name: Cache local node_modules
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ github.ref }}-${{ hashFiles('**/package-lock.json') }}
@@ -73,29 +76,29 @@ jobs:
   # anchor definitions yet, thus we cannot put same steps into a template object yet
   test1:
     name: Cypress test 1
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     needs: install
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
 
       # install a specific version of Node using
       # https://github.com/actions/setup-node
-      - name: Use Node.js v12
-        uses: actions/setup-node@v1
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
         with:
-          node-version: 12
+          node-version: 20
 
       # Restore just local node_modules and the Cypress binary archives.
       - name: Cache Cypress binary
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ~/.cache/Cypress
-          key: cypress-${{ runner.os }}-cypress-${{ github.ref }}-${{ hashFiles('**/package.json') }}
+          key: cypress-${{ runner.os }}-cypress-${{ github.ref }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            cypress-${{ runner.os }}-cypress-${{ github.ref }}-${{ hashFiles('**/package.json') }}
+            cypress-${{ runner.os }}-cypress-${{ github.ref }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Cache local node_modules
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ github.ref }}-${{ hashFiles('**/package-lock.json') }}
@@ -108,7 +111,7 @@ jobs:
           npx cypress cache path
           npx cypress cache list
 
-      # Starts local server, then runs Cypress tests and records results on the dashboard
+      # Starts local server, then runs Cypress tests and records results on Cypress Cloud
       - name: Cypress tests
         run: |
           npm start &
@@ -119,9 +122,9 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.dashboardRecordKey }}
           TERM: xterm
 
-      # Save videos and screenshots as test artifacts
+      # Save screenshots as test artifacts
       # https://github.com/actions/upload-artifact
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         # there might be no screenshots created when:
         # - there are no test failures
         # so only upload screenshots if previous step has failed
@@ -129,37 +132,32 @@ jobs:
         with:
           name: screenshots
           path: cypress/screenshots
-      # video should always be generated
-      - uses: actions/upload-artifact@master
-        with:
-          name: videos
-          path: cypress/videos
 
   test2:
     name: Cypress test 2
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     needs: install
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
 
       # install a specific version of Node using
       # https://github.com/actions/setup-node
-      - name: Use Node.js v12
-        uses: actions/setup-node@v1
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
         with:
-          node-version: 12
+          node-version: 20
 
       # Restore just local node_modules and the Cypress binary archives.
       - name: Cache Cypress binary
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ~/.cache/Cypress
-          key: cypress-${{ runner.os }}-cypress-${{ github.ref }}-${{ hashFiles('**/package.json') }}
+          key: cypress-${{ runner.os }}-cypress-${{ github.ref }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             cypress-${{ runner.os }}-cypress-${{ github.ref }}-
 
       - name: Cache local node_modules
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-modules-${{ github.ref }}-${{ hashFiles('**/package-lock.json') }}
@@ -172,7 +170,7 @@ jobs:
           npx cypress cache path
           npx cypress cache list
 
-      # Starts local server, then runs Cypress tests and records results on the dashboard
+      # Starts local server, then runs Cypress tests and records results on Cypress Cloud
       - name: Cypress tests
         run: |
           npm start &
@@ -183,9 +181,9 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.dashboardRecordKey }}
           TERM: xterm
 
-      # Save videos and screenshots as test artifacts
+      # Save screenshots as test artifacts
       # https://github.com/actions/upload-artifact
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         # there might be no screenshots created when:
         # - there are no test failures
         # so only upload screenshots if previous step has failed
@@ -193,8 +191,3 @@ jobs:
         with:
           name: screenshots
           path: cypress/screenshots
-      # video should always be generated
-      - uses: actions/upload-artifact@master
-        with:
-          name: videos
-          path: cypress/videos

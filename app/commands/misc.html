@@ -45,7 +45,7 @@
               <li><a href="/commands/waiting">Waiting</a></li>
               <li><a href="/commands/network-requests">Network Requests</a></li>
               <li><a href="/commands/files">Files</a></li>
-              <li><a href="/commands/local-storage">Local Storage</a></li>
+              <li><a href="/commands/storage">Storage</a></li>
               <li><a href="/commands/cookies">Cookies</a></li>
               <li><a href="/commands/spies-stubs-clocks">Spies, Stubs &amp; Clocks</a></li>
             </ul>
@@ -70,7 +70,6 @@
   <div class="container content-container">
     <div id="misc">
       <div class="row">
-
         <div class="col-xs-7">
           <h4 id="end"><a href="https://on.cypress.io/end">.end()</a></h4>
           <p>To end the command chain, use the <a href="https://on.cypress.io/end"><code>.end()</code></a> command.</p>
@@ -108,7 +107,6 @@ cy.get('.misc-table').within(() => {
         </div>
 
         <div class="col-xs-12"><hr></div>
-
         <div class="col-xs-12">
           <h4 id="exec"><a href="https://on.cypress.io/exec">cy.exec()</a></h4>
           <p>To execute a system command, use the <a href="https://on.cypress.io/exec"><code>cy.exec()</code></a> command.</p>
@@ -123,10 +121,10 @@ cy.exec('echo Jane Lane')
 cy.log(`Platform ${Cypress.platform} architecture ${Cypress.arch}`)
 
 if (Cypress.platform === 'win32') {
-  cy.exec('print cypress.json')
+  cy.exec('print cypress.config.js')
     .its('stderr').should('be.empty')
 } else {
-  cy.exec('cat cypress.json')
+  cy.exec('cat cypress.config.js')
     .its('stderr').should('be.empty')
 
   cy.exec('pwd')

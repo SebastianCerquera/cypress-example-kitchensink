@@ -4,14 +4,7 @@ env:
   - PUPPETEER_SKIP_DOWNLOAD=1
 
 node_js:
-  - 12
-
-# if using Ubuntu 16 need this library
-# https://github.com/cypress-io/cypress-documentation/pull/1647
-addons:
-  apt:
-    packages:
-    - libgconf-2-4
+  - 20
 
 cache:
   # cache both npm modules and Cypress binary
@@ -26,8 +19,8 @@ cache:
 defaults: &defaults
   script:
     #   ## print all Travis environment variables for debugging
-    - $(npm bin)/print-env TRAVIS
-    - npm run start:ci &
+    - npx print-env TRAVIS
+    - npm run start &
     - npm run cy:run -- --record --parallel --group $STAGE_NAME
     # after all tests finish running we need
     # to kill all background jobs (like "npm start &")

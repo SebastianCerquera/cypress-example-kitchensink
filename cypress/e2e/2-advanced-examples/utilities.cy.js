@@ -19,10 +19,9 @@ context('Utilities', () => {
     // https://on.cypress.io/$
     let $li = Cypress.$('.utility-jquery li:first')
 
-    cy.wrap($li)
-      .should('not.have.class', 'active')
-      .click()
-      .should('have.class', 'active')
+    cy.wrap($li).should('not.have.class', 'active')
+    cy.wrap($li).click()
+    cy.wrap($li).should('have.class', 'active')
   })
 
   it('Cypress.Blob - blob utilities and base64 string conversion', () => {
@@ -41,7 +40,7 @@ context('Utilities', () => {
         $div.append(img)
 
         cy.get('.utility-blob img').click()
-          .should('have.attr', 'src', dataUrl)
+        cy.get('.utility-blob img').should('have.attr', 'src', dataUrl)
       })
     })
   })
@@ -85,7 +84,6 @@ context('Utilities', () => {
      */
     function waitOneSecond () {
       // return a promise that resolves after 1 second
-      // @ts-ignore TS2351 (new Cypress.Promise)
       // eslint-disable-next-line no-unused-vars
       return new Cypress.Promise((resolve, reject) => {
         setTimeout(() => {
@@ -101,7 +99,6 @@ context('Utilities', () => {
     cy.then(() => {
       // return a promise to cy.then() that
       // is awaited until it resolves
-      // @ts-ignore TS7006
       return waitOneSecond().then((str) => {
         expect(str).to.eq('foo')
         expect(waited).to.be.true

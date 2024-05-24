@@ -2,15 +2,12 @@
 
 /// JSON fixture file can be loaded directly using
 // the built-in JavaScript bundler
-// @ts-ignore
 const requiredExample = require('../../fixtures/example')
 
 context('Files', () => {
   beforeEach(() => {
     cy.visit('http://localhost:8080/commands/files')
-  })
 
-  beforeEach(() => {
     // load example.json fixture file and store
     // in the test context object
     cy.fixture('example.json').as('example')
@@ -43,8 +40,7 @@ context('Files', () => {
       .to.deep.equal(requiredExample)
 
     // or use "cy.wrap" and "should('deep.equal', ...)" assertion
-    // @ts-ignore
-    cy.wrap(this.example, 'fixture vs require')
+    cy.wrap(this.example)
       .should('deep.equal', requiredExample)
   })
 
@@ -53,8 +49,8 @@ context('Files', () => {
 
     // You can read a file and yield its contents
     // The filePath is relative to your project's root.
-    cy.readFile('cypress.json').then((json) => {
-      expect(json).to.be.an('object')
+    cy.readFile(Cypress.config('configFile')).then((config) => {
+      expect(config).to.be.an('string')
     })
   })
 

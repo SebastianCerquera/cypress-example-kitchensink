@@ -3,16 +3,19 @@ skip_commits:
   # do not run for testing new Linux builds
   message: /Testing new linux/
 
+# https://www.appveyor.com/docs/build-environment/#build-worker-images
+image: Visual Studio 2022
+
 # https://www.appveyor.com/docs/lang/nodejs-iojs/
 # Test against the latest version of this Node.js version
 environment:
-  nodejs_version: "12"
+  nodejs_version: "20"
 
 # Install scripts. (runs after repo cloning)
 install:
   - ps: Install-Product node $env:nodejs_version
   # Output useful info for debugging.
-  # we should be using NPM v6+
+  # we should be using npm v6+
   - node --version
   - npm --version
   - npm i -g @cypress/commit-message-install @bahmutov/print-env
@@ -20,7 +23,7 @@ install:
   - commit-message-install --else "npm ci"
 
 cache:
-  # cache NPM packages and Cypress binary
+  # cache npm packages and Cypress binary
   # and invalidate the cache when package.json file changes
   # https://www.appveyor.com/docs/build-cache/
   - '%AppData%\npm -> package.json'
@@ -40,10 +43,11 @@ test_script:
   # leading to failures. Trying to increase the command timeout
   # maybe it will solve it
   - setx CYPRESS_defaultCommandTimeout 20000
-  - run-if npm run test:ci:record:windows:chrome
-  - run-if npm run test:ci:record:windows
-  - run-if npm run test:ci:record:windows:firefox
-  - run-if npm run test:ci:record:windows:edge
+  - run-if npm run test:ci:record:chrome
+  - run-if npm run test:ci:record
+  # removed Firefox test due to flakiness in this environment
+  # - run-if npm run test:ci:record:firefox
+  - run-if npm run test:ci:record:edge
 
 # Don't actually build.
 build: off

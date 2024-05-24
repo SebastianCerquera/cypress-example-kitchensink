@@ -68,7 +68,7 @@ blocks:
       # common commands that should be done before each E2E test command
       prologue:
         commands:
-          - nvm install 12
+          - nvm install 20
           - npm install -g npm
           - checkout
 
@@ -80,7 +80,7 @@ blocks:
           - npm ci
           # verify the Cypress test binary so its check status is cached
           - npm run cy:verify
-          # Cache NPM dependencies and Cypress binary
+          # Cache npm dependencies and Cypress binary
           - cache store npm-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json)-$(checksum .semaphore/semaphore.yml) ~/.npm
           - cache store cypress-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json)-$(checksum .semaphore/semaphore.yml) ~/.cache/Cypress
 
@@ -89,7 +89,7 @@ blocks:
           # finally, build the web application and run end-to-end tests
           - npm run build
           # start the web application server in the background
-          - npm run start:ci &
+          - npm run start &
 
       jobs:
         # all "prologue" commands have finished by now
